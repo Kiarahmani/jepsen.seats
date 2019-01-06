@@ -79,7 +79,7 @@
                   (System/getenv "CASSANDRA_TARBALL_URL")
                   (str "http://apache.claz.org/cassandra/" version
                        "/apache-cassandra-" version "-bin.tar.gz"))]
-      (info node ">>>>>> installing Cassandra from" url)
+      (info ">>>>>> installing Cassandra from" url)
       (if (cached-install? url)
         (info ">>>>>> used cached install on node" node)
         (do (if tpath ;; else: if not found locally, download it
@@ -113,7 +113,7 @@
                       "\"s/seeds: .*/seeds: 'n1,n2'/g\""
                       (str "\"s/listen_address: .*/listen_address: " (dns-resolve node)
                            "/g\"")
-                      (str "\"s/read_request_timeout: .*/read_request_timeout: 10000" "/g\"")
+                      (str "\"s/read_request_timeout_in_ms: .*/read_request_timeout_in_ms: 10000" "/g\"")
                       (str "\"s/rpc_address: .*/rpc_address: " (dns-resolve node) "/g\"")
                       (str "\"s/broadcast_rpc_address: .*/broadcast_rpc_address: "
                            (net/local-ip) "/g\"")
@@ -152,7 +152,7 @@
     (c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " (dns-resolve node)  " -f /home/ubuntu/resource/ddl.cql" ))
     (info "Keyspace and tables intialized")
     (doseq [t tables]
-      (do (info (str "Loading SSTables for: " t))
+      (do (info (str "Loading raw data in table: " t))
           ; snapshot based solution:
           ;(c/exec* (str "/home/ubuntu/cassandra/bin/sstableloader  -d " (dns-resolve node) " /home/ubuntu/" consts/_KEYSPACE_NAME "/" t))
           ; .csv solution:
