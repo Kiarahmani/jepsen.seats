@@ -78,11 +78,12 @@ touch $LOCK_FILE
 
 
 # --- Body --------------------------------------------------------
-echo ">>> updating java application from git repository:"
-cd ~/Jepsen_Java_Tests/ 
-git pull
-cd - >/dev/null
 
+	echo ">>> updating java application from git repository:"
+	cd ~/Jepsen_Java_Tests/ 
+	git pull
+	cd - >/dev/null
+	
 if [ ${LOADRAW} = "true" ]; then
 	# copying necessary files to the root dir
 	cp /home/ubuntu/Jepsen_Java_Tests/table.names /home/ubuntu/table.names
@@ -91,18 +92,20 @@ if [ ${LOADRAW} = "true" ]; then
 	    echo ">>> copying resource files to node: $line"
 	    scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/table.names ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
 	    scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/ddl.cql ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
-	    while IFS='' read -r table || [[ -n "$table" ]]; do
-	    	scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/load_${table}.cql ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
-	    done < "/home/ubuntu/table.names" 
+	    #while IFS='' read -r table || [[ -n "$table" ]]; do
+	    #	scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/load_${table}.cql ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
+	    #done < "/home/ubuntu/table.names" 
 	    echo "done."
     	done < "/home/ubuntu/nodes"
+
+	echo ">>> copying snapshots to n1"
+	scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/snapshots/seats ubuntu@n1:/home/ubuntu/
 fi
 
-#scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/snapshots/seats ubuntu@n1:/home/ubuntu/
 
 echo ""
 echo ">>> calling Jepsen:"
-time lein run test --nodes-file ~/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS}  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem
+time lein run test --nodes-file ~/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS} --init-java  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem
 
 
 

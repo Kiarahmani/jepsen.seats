@@ -51,22 +51,22 @@
     (setup! [_ test node]
         ; tear down the cluster and start again
         (when (boolean (:init-db test))
-              (info node "<<initDB>> installing cassandra" version "--"  (boolean (:init-db test)))
+              (info node ">>> installing cassandra" version "--"  (boolean (:init-db test)))
               (wipe! node)
 	      (when (boolean (:init-java test))
-                (info node "<<initJava>> installing java --" (boolean (:init-java test)))
+                (info node ">>> installing java --" (boolean (:init-java test)))
                 (initJava! node version))
 	      (install! node version)
-              (info "cassandra is installed")
+              (info ">>> cassandra is installed")
               (configure! node test)
-              (info "cassandra is configured"))
+              (info ">>> cassandra is configured"))
         (start! node test)
-        (info "cassandra is started")
+        (info ">>> cassandra is started")
         (when (boolean (:init-ks test))
            (Thread/sleep 6000)
           (prepareDB! node test (line-seq (clojure.java.io/reader "/home/ubuntu/table.names")))))
     (teardown! [_ test node]
-      (info node "tearing down cassandra")
+      (info node ">>> tearing down cassandra")
       ;(wipe! node)
     )
      db/LogFiles
@@ -112,7 +112,7 @@
 	  :model      (my-txn-status)
 	  :client (Client. nil)
 	  :generator (->> my-gen
-                          (gen/stagger 1/100)
+                          (gen/stagger 1/100000) ;XXX
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
 

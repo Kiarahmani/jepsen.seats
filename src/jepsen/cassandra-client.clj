@@ -5,9 +5,10 @@
 (defrecord Client [conn]
   client/Client
   (open! [this test node]
-	(assoc this :conn (openConnection (dns-resolve node))))    
+	(assoc this :conn (openConnection (dns-resolve node)))
+        (assoc this :something (openSomething (dns-resolve node))))    
   (setup! [this test]
-    (info "creating initial data structures")
+    (info ">>> creating initial data structures")
     (SeatsUtils/initialize)
     )
   (invoke! [this test op]

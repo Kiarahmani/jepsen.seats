@@ -90,14 +90,27 @@
             (c/exec :mv (lit "~/apache* ~/cassandra"))
             (c/exec :echo url :> (lit ".download"))))))))
 
+
+(defn allNodes!
+  "given the current test setup, will return all node names separated with commas to be used in Cassandra configurations"
+  [test]
+  (let [nodeList   (:nodes test)
+        nodeString (reduce (fn [oldN n] 
+                             (if (= oldN "")
+                             (str oldN n)
+                             (str oldN "," n))) "" nodeList)]
+       (str "'" nodeString "'")))
+  
+
 ;;====================================================================================
 (defn configure!
   "Uploads configuration files to the given node."
   [node test]
   (info node (str "configuring Cassandra"))
   (c/su
- 	(doseq [rep ["\"s/#MAX_HEAP_SIZE=.*/MAX_HEAP_SIZE='512M'/g\""
-                     "\"s/#HEAP_NEWSIZE=.*/HEAP_NEWSIZE='128M'/g\""
+ 	(doseq [rep [
+                     ;"\"s/#MAX_HEAP_SIZE=.*/MAX_HEAP_SIZE='512M'/g\""
+                     ;"\"s/#HEAP_NEWSIZE=.*/HEAP_NEWSIZE='128M'/g\""
                      "\"s/LOCAL_JMX=yes/LOCAL_JMX=no/g\""
                 (str "'s/# JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname="
                      "<public name>\"/JVM_OPTS=\"$JVM_OPTS -Djava.rmi.server.hostname="
@@ -110,7 +123,7 @@
      (doseq [rep (into ["\"s/cluster_name: .*/cluster_name: 'jepsen'/g\""
                       "\"s/row_cache_size_in_mb: .*/row_cache_size_in_mb: 20/g\""
 		      "\"s/endpoint_snitch: .*/endpoint_snitch: GossipingPropertyFileSnitch/g\""
-                      "\"s/seeds: .*/seeds: 'n1,n2'/g\""
+                      (str "\"s/seeds: .*/seeds: " (allNodes! test) "/g\"")
                       (str "\"s/listen_address: .*/listen_address: " (dns-resolve node)
                            "/g\"")
                       (str "\"s/read_request_timeout_in_ms: .*/read_request_timeout_in_ms: 10000" "/g\"")
@@ -141,22 +154,35 @@
      			:>> "~/cassandra/conf/cassandra-env.sh")
      (c/exec :sed :-i (lit "\"s/INFO/DEBUG/g\"") "~/cassandra/conf/logback.xml"):while))
 ;;====================================================================================
+; create KEYSPACE seats WITH replication = {'class': 'NetworkTopologyStrategy', 'dc_n1':1,'dc_n2':1,'dc_n3':1, 'dc_n4':1, 'dc_n5':1};
 
+(defn prepareKS!
+  "returns the string for cqlsh to make the keysapace based on the number of nodes"
+  [dcs]
+  (let [dropComm "drop KEYSPACE IF EXISTS seats;"
+        dcString (reduce (fn [oldDc newDc] (str oldDc ", 'dc_" newDc "':1")) "" dcs)
+        finalComm (str dropComm " create KEYSPACE seats WITH replication = {'class': 'NetworkTopologyStrategy'" dcString "};")]
+    finalComm
+    ))
 
 (defn prepareDB! 
   "creating keyspace and tables"
   [node test tables]
   (when (= (str node) "n1") 
-  ;  (Thread/sleep 55000)
-    (info "creating keyspace and tables" (dns-resolve node))
+    ;(Thread/sleep 50000)
+    (info ">>> creating keyspace on: " (dns-resolve node))
+    (c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " node " -e \"" (prepareKS! (:nodes test)) "\"" ))
+    (info ">>> creating tablese on: " (dns-resolve node))
     (c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " (dns-resolve node)  " -f /home/ubuntu/resource/ddl.cql" ))
-    (info "Keyspace and tables intialized")
+    (info ">>> keyspace and tables intialized")
     (doseq [t tables]
-      (do (info (str "Loading raw data in table: " t))
+      (do ; .csv solution:
+          ;(info (str "Loading raw data in table: " t))
+          ;(c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " (dns-resolve node)  " -f /home/ubuntu/resource/load_" t ".cql" ))
+          
           ; snapshot based solution:
-          ;(c/exec* (str "/home/ubuntu/cassandra/bin/sstableloader  -d " (dns-resolve node) " /home/ubuntu/" consts/_KEYSPACE_NAME "/" t))
-          ; .csv solution:
-          (c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " (dns-resolve node)  " -f /home/ubuntu/resource/load_" t ".cql" ))
+          (info (str "Copying snapshots for: " t))
+          (c/exec* (str "/home/ubuntu/cassandra/bin/sstableloader  -d " (dns-resolve node) " /home/ubuntu/" consts/_KEYSPACE_NAME "/" t))
           ))
     ;(c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " (dns-resolve node)  " -f /home/ubuntu/load.cql" ))
     (Thread/sleep 1000)
@@ -170,7 +196,7 @@
 (defn start!
   "Starting Cassandra..."
   [node test]
-  ;(when (= (str node) "n4")  (Thread/sleep 40000))
+  ;(when (= (str node) "n5")  (Thread/sleep 40000))
   (info node (str "starting Cassandra on " (dns-resolve node)))
   (c/su
    (c/exec* (str "/home/ubuntu/cassandra/bin/cassandra -R"))))
