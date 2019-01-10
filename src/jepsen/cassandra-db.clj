@@ -169,7 +169,6 @@
   "creating keyspace and tables"
   [node test tables]
   (when (= (str node) "n1") 
-    ;(Thread/sleep 50000)
     (info ">>> creating keyspace on: " (dns-resolve node))
     (c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " node " -e \"" (prepareKS! (:nodes test)) "\"" ))
     (info ">>> creating tablese on: " (dns-resolve node))
@@ -186,7 +185,9 @@
           ))
     ;(c/exec* (str "/home/ubuntu/cassandra/bin/cqlsh " (dns-resolve node)  " -f /home/ubuntu/load.cql" ))
     (Thread/sleep 1000)
-    (info (str "Initial SSTables loaded "))))
+    (info (str ">>> initial SSTables loaded ")
+    (info ">>> creating a java connection pool")
+    )))
 
 
 
@@ -196,7 +197,6 @@
 (defn start!
   "Starting Cassandra..."
   [node test]
-  ;(when (= (str node) "n5")  (Thread/sleep 40000))
   (info node (str "starting Cassandra on " (dns-resolve node)))
   (c/su
    (c/exec* (str "/home/ubuntu/cassandra/bin/cassandra -R"))))

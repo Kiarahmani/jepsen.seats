@@ -46,7 +46,7 @@
 ;;====================================================================================
 (defn db
   "Cassandra for a particular version."
-  [version]
+  [version nodes concurrency]
   (reify db/DB
     (setup! [_ test node]
         ; tear down the cluster and start again
@@ -63,8 +63,11 @@
         (start! node test)
         (info ">>> cassandra is started")
         (when (boolean (:init-ks test))
-           (Thread/sleep 6000)
-          (prepareDB! node test (line-seq (clojure.java.io/reader "/home/ubuntu/table.names")))))
+           (prepareDB! node test (line-seq (clojure.java.io/reader "/home/ubuntu/table.names")))
+           (Thread/sleep 7000))
+        (SeatsClient/prepareConnections nodes concurrency)
+        (Thread/sleep 2000)
+        )
     (teardown! [_ test node]
       (info node ">>> tearing down cassandra")
       ;(wipe! node)
@@ -81,7 +84,9 @@
          sum 0
          ops operationMap]
     (if (> (+ sum (:freq (first ops))) randomIn)
-      (first ops)
+    (do
+    (info "returning: " (:f (first ops)))
+    (first ops))
     (recur randIn (+ sum (:freq (first ops))) (rest ops))))
  )
 
@@ -103,7 +108,7 @@
          opts
 	 {:name "cassandra"
           :os   debian/os
-          :db   (db "3.11.3")
+          :db   (db "3.11.3"  (count (:nodes opts)) (:concurrency opts))
 	  :checker (checker/compose
                     {:perf   (checker/perf)
                      :linear (myStatusChecker)
@@ -112,7 +117,7 @@
 	  :model      (my-txn-status)
 	  :client (Client. nil)
 	  :generator (->> my-gen
-                          (gen/stagger 1/100000) ;XXX
+                          (gen/stagger 1/10) ;XXX
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
 

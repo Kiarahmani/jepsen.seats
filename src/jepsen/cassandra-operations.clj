@@ -3,26 +3,25 @@
 
 (def closeConnection (fn [conn]    (SeatsClient/closeConnection conn)))
 (def openConnection  (fn [ip]      (SeatsClient/getConnection ip)))
-(def openSomething  (fn [ip]      (SeatsClient/getSomething ip)))
 
 (def operationMap [{:n 1, :f :DR-TXN, 
                           :javaFunc (fn [conn args] (SeatsClient/deleteReservation conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4))), 
-                          :freq 10/100},
+                          :freq 10/100},;10
                    {:n 2, :f :FF-TXN, 
                           :javaFunc (fn [conn args] (SeatsClient/findFlights conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4))), 
-                          :freq 10/100},
+                          :freq 10/100},;10
                    {:n 3, :f :FOS-TXN, 
                           :javaFunc (fn [conn args] (SeatsClient/findOpenSeats conn (nth args 0))), 
-                          :freq 35/100},
+                          :freq 35/100},;35
                    {:n 4, :f :NR-TXN, 
                           :javaFunc (fn [conn args] (SeatsClient/newReservation conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5))), 
-                          :freq 20/100},
+                          :freq 20/100},;20
                    {:n 5, :f :UC-TXN, 
                           :javaFunc (fn [conn args] (SeatsClient/updateCustomer conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4))), 
-                          :freq 10/100},
+                          :freq 10/100},;10
                    {:n 6, :f :UR-TXN, 
                           :javaFunc (fn [conn args] (SeatsClient/updateReservation conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5))), 
-                          :freq 15/100}
+                          :freq 15/100};15
 
                    ])
 
