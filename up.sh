@@ -24,6 +24,10 @@ case $i in
     KS="${i#*=}"
     shift # past argument=value
     ;;
+    -b=*|--bench=*)
+    BENCH="${i#*=}"
+    shift # past argument=value
+    ;;
     -t=*|--time=*)
     TIME="${i#*=}"
     shift # past argument=value
@@ -46,6 +50,7 @@ echo "     Automated Jepsen Test on EC2"
 echo "====================================="
 echo "Conccurency   = ${CONCURRENCY}"
 echo "Time          = ${TIME}"
+echo "Benchmark     = ${BENCH}"
 echo "Load Raw Data = ${LOADRAW}"
 echo "Initialize DB = ${DB}"
 echo "Initialize KS = ${KS}"
@@ -96,10 +101,10 @@ if [ ${LOADRAW} = "true" ]; then
 	    #	scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/load_${table}.cql ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
 	    #done < "/home/ubuntu/table.names" 
 	    echo "done."
-    	done < "/home/ubuntu/nodes"
+    	done < "/home/ubuntu/jepsen.seats/config/nodes"
 
 	echo ">>> copying snapshots to n1"
-	scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/jepsen.seats/snapshots/seats ubuntu@n1:/home/ubuntu/
+	scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/jepsen.seats/snapshots/$BENCH ubuntu@n1:/home/ubuntu/
 fi
 
 
