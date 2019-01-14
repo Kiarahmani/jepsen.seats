@@ -63,9 +63,9 @@
         (start! node test)
         (info ">>> cassandra is started")
         (when (boolean (:init-ks test))
-           (prepareDB! node test (line-seq (clojure.java.io/reader "/home/ubuntu/table.names")))
+           (prepareDB! node test (line-seq (clojure.java.io/reader "/home/ubuntu/jepsen.seats/config/table.names")))
            (Thread/sleep 7000))
-        (SeatsClient/prepareConnections nodes concurrency)
+        (SeatsClient/prepareConnections nodes concurrency consts/_KEYSPACE_NAME)
         (Thread/sleep 2000)
         )
     (teardown! [_ test node]

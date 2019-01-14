@@ -113,8 +113,48 @@
   [errorCode]
   (condp = errorCode 
     -1 "Generic exception thrown."
-     1 "No Customer information based on the given c_id_str found."
-       "unknown error.")
+    
+    ; delete reservation
+    11 "No Customer information based on the given c_id_str found."
+    12 "c_i (either given or extracted based on customer name) does not exist"
+    13 "given f_id does not exit"
+    14 "reservation for the given/extracted f_id and c_id does not exist"
+    15 "delete did NOT succeed" 
+    16 "update flight did NOT succeed"
+    17 "update customer balance did NOT succeed"
+    18 "Frequent Flyer does not exist"
+    19 "update frequent flyer did NOT succeed"
+    
+    ; find flights
+    21 "requested airline does not exist"
+    22 "departure airport does not exist"
+    23 "arrival airport does not exist"
+  
+    ; find open seats
+    31 "given f_id does not exist"
+    32 "duplicate seat reservations"
+    
+    ; new reservation
+    41 "invalid f_id is given"
+    42 "extracted airline_id is invalid"
+    43 "No more seats available for flight"
+    44 "Seatis already reserved on flight"
+    45 "Customer already owns on a reservations on flight"
+    46 "Invalid customer id"
+
+
+    ; update customer
+    51 "No Customer information record found for the string"
+    52 "No Customer information record found for the given c_id"
+    53 "unacceptable state: wrong customer is retrieved"
+    54 "base airport_id is invalid"
+    55 "country does not exist"
+
+    ; update reservation
+    61 "Seat is already reserved on flight"
+    62 "Customer does not have an existing reservation on flight"
+
+     "unknown error.")
   )
 
 

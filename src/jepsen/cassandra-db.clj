@@ -154,14 +154,13 @@
      			:>> "~/cassandra/conf/cassandra-env.sh")
      (c/exec :sed :-i (lit "\"s/INFO/DEBUG/g\"") "~/cassandra/conf/logback.xml"):while))
 ;;====================================================================================
-; create KEYSPACE seats WITH replication = {'class': 'NetworkTopologyStrategy', 'dc_n1':1,'dc_n2':1,'dc_n3':1, 'dc_n4':1, 'dc_n5':1};
 
 (defn prepareKS!
   "returns the string for cqlsh to make the keysapace based on the number of nodes"
   [dcs]
-  (let [dropComm "drop KEYSPACE IF EXISTS seats;"
+  (let [dropComm (str "drop KEYSPACE IF EXISTS " consts/_KEYSPACE_NAME ";")
         dcString (reduce (fn [oldDc newDc] (str oldDc ", 'dc_" newDc "':1")) "" dcs)
-        finalComm (str dropComm " create KEYSPACE seats WITH replication = {'class': 'NetworkTopologyStrategy'" dcString "};")]
+        finalComm (str dropComm " create KEYSPACE " consts/_KEYSPACE_NAME " WITH replication = {'class': 'NetworkTopologyStrategy'" dcString "};")]
     finalComm
     ))
 

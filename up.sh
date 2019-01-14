@@ -44,11 +44,11 @@ done
 echo "====================================="
 echo "     Automated Jepsen Test on EC2"
 echo "====================================="
-echo "Conccurency:   = ${CONCURRENCY}"
-echo "Time:          = ${TIME}"
-echo "Load Raw Data: = ${LOADRAW}"
-echo "Initialize DB: = ${DB}"
-echo "Initialize KS: = ${KS}"
+echo "Conccurency   = ${CONCURRENCY}"
+echo "Time          = ${TIME}"
+echo "Load Raw Data = ${LOADRAW}"
+echo "Initialize DB = ${DB}"
+echo "Initialize KS = ${KS}"
 echo "====================================="
 
 # --- Parameter Handling ------------------------------------------
@@ -86,7 +86,7 @@ touch $LOCK_FILE
 	
 if [ ${LOADRAW} = "true" ]; then
 	# copying necessary files to the root dir
-	cp /home/ubuntu/Jepsen_Java_Tests/table.names /home/ubuntu/table.names
+	cp /home/ubuntu/Jepsen_Java_Tests/table.names /home/ubuntu/jepsen.seats/config/table.names
 	# copying necessary files to jepsen nodes
 	while IFS='' read -r line || [[ -n "$line" ]]; do
 	    echo ">>> copying resource files to node: $line"
@@ -99,19 +99,32 @@ if [ ${LOADRAW} = "true" ]; then
     	done < "/home/ubuntu/nodes"
 
 	echo ">>> copying snapshots to n1"
-	scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/snapshots/seats ubuntu@n1:/home/ubuntu/
+	scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/jepsen.seats/snapshots/seats ubuntu@n1:/home/ubuntu/
 fi
+
+
 
 
 echo ""
 echo ">>> calling Jepsen:"
-time lein run test --nodes-file ~/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS} --init-java  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem
+time lein run test --nodes-file /home/ubuntu/jepsen.seats/config/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS} --init-java  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem
 
 
 
 
 
 
-
-
+echo ""
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo ">>> analyzing logs:"
+UniqeErrors=`grep -E "TXN\s[1-9][1-9]" store/latest/history.txt | cut -f3,4 | sort | uniq`
+echo
+for i in $UniqeErrors; do
+	if [[ $i == :* ]]; then
+		echo -n $i
+	else 	
+		echo  " -- ERROR" $i
+	fi
+done
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
