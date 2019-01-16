@@ -7,6 +7,6 @@
                  [jepsen "0.1.11"]
 		 [environ "1.1.0"]
 		 [verschlimmbesserung "0.1.3"]]
-  :java-source-paths ["/home/ubuntu/Jepsen_Java_Tests/src/main/java"]
+  :java-source-paths ["/home/ubuntu/Jepsen_Java_Tests/src/main/java/"]
   :resource-paths ["resources/cassandra-jdbc-wrapper-3.1.0-SNAPSHOT.jar"]
 )

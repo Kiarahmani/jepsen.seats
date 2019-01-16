@@ -91,12 +91,12 @@ touch $LOCK_FILE
 	
 if [ ${LOADRAW} = "true" ]; then
 	# copying necessary files to the root dir
-	cp /home/ubuntu/Jepsen_Java_Tests/table.names /home/ubuntu/jepsen.seats/config/table.names
+        cp /home/ubuntu/Jepsen_Java_Tests/src/main/java/$BENCH/table.names /home/ubuntu/jepsen.seats/config/table.names
 	# copying necessary files to jepsen nodes
 	while IFS='' read -r line || [[ -n "$line" ]]; do
 	    echo ">>> copying resource files to node: $line"
-	    scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/table.names ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
-	    scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/ddl.cql ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
+	    scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/src/main/java/$BENCH/table.names ubuntu@${line}:/home/ubuntu/resource/ 
+	    scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/src/main/java/$BENCH/ddl.cql ubuntu@${line}:/home/ubuntu/resource/ 
 	    #while IFS='' read -r table || [[ -n "$table" ]]; do
 	    #	scp -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/Jepsen_Java_Tests/load_${table}.cql ubuntu@${line}:/home/ubuntu/resource/ >/dev/null
 	    #done < "/home/ubuntu/table.names" 

@@ -8,7 +8,7 @@
 	(assoc this :conn (openConnection (dns-resolve node))))    
   (setup! [this test]
     (info ">>> creating initial data structures")
-    (SeatsUtils/initialize)
+    (seats.SeatsUtils/initialize)
     )
   (invoke! [this test op]
       (let [txn (:javaFunc (first (filter (fn [m] (= (:f m) (:f op))) operationMap)))
