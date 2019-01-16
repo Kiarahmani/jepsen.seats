@@ -83,15 +83,28 @@ touch $LOCK_FILE
 
 
 # --- Body --------------------------------------------------------
+#
+echo ">>> updating java application from git repository:"
+cd ~/Jepsen_Java_Tests/ 
+git pull
+cd - >/dev/null
+echo "done."
 
-	echo ">>> updating java application from git repository:"
-	cd ~/Jepsen_Java_Tests/ 
-	git pull
-	cd - >/dev/null
-	
+
+
+#
+echo ">>> replacing generic cassandra-operation.clj with benchmark specific file"
+cp /home/ubuntu/jepsen.seats/src/jepsen/benchmarks/$BENCH.clj /home/ubuntu/jepsen.seats/src/jepsen/cassandra-operations.clj
+echo "done."
+
+# 
+echo "copying table.names file from Application's dir to the config dir"
+cp /home/ubuntu/Jepsen_Java_Tests/src/main/java/$BENCH/table.names /home/ubuntu/jepsen.seats/config/table.names
+echo "done."
+
+
+#
 if [ ${LOADRAW} = "true" ]; then
-	# copying necessary files to the root dir
-        cp /home/ubuntu/Jepsen_Java_Tests/src/main/java/$BENCH/table.names /home/ubuntu/jepsen.seats/config/table.names
 	# copying necessary files to jepsen nodes
 	while IFS='' read -r line || [[ -n "$line" ]]; do
 	    echo ">>> copying resource files to node: $line"
@@ -112,7 +125,7 @@ fi
 
 echo ""
 echo ">>> calling Jepsen:"
-time lein run test --nodes-file /home/ubuntu/jepsen.seats/config/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS} --init-java  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem
+time lein run test --nodes-file /home/ubuntu/jepsen.seats/config/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS} --init-java  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem --bench ${BENCH}
 
 
 

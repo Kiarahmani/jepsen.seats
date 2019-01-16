@@ -45,13 +45,18 @@
     [["-i" "--init-db" "wipes down any excisting data and creates a fresh cluster"]
      ["-j" "--init-java" "installs java in freshly created jepsen nodes"]
      ["-k" "--init-ks" "drops old keyspace and tables and creates and intializes fresh ones"]
+     [nil "--bench BENCH" "the benchmark under test" 
+      :default  "DEFAULT_BENCHMARK"
+      :parse-fn read-string
+      
+      ]
      ])
 
 
 ;;====================================================================================
 (defn db
   "Cassandra for a particular version."
-  [version nodes concurrency]
+  [version nodes concurrency bench]
   (reify db/DB
     (setup! [_ test node]
         ; tear down the cluster and start again
@@ -68,9 +73,9 @@
         (start! node test)
         (info ">>> cassandra is started")
         (when (boolean (:init-ks test))
-           (prepareDB! node test (line-seq (clojure.java.io/reader "/home/ubuntu/jepsen.seats/config/table.names")))
+           (prepareDB! node test (line-seq (clojure.java.io/reader "/home/ubuntu/jepsen.seats/config/table.names")) bench)
            (Thread/sleep 7000))
-        (utils.CassConn/prepareConnections nodes concurrency consts/_KEYSPACE_NAME)
+        (utils.CassConn/prepareConnections nodes concurrency bench)
         (Thread/sleep 2000)
         )
     (teardown! [_ test node]
@@ -113,7 +118,7 @@
          opts
 	 {:name "cassandra"
           :os   debian/os
-          :db   (db "3.11.3"  (count (:nodes opts)) (:concurrency opts))
+          :db   (db "3.11.3"  (count (:nodes opts)) (:concurrency opts) (str (:bench opts)))
 	  :checker (checker/compose
                     {:perf   (checker/perf)
                      :linear (myStatusChecker)

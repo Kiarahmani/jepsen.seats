@@ -6,7 +6,6 @@
 ; constants
 (def _CUST_BY_STR_PROB 0.05)
 (def _FF_SHOULD_BE_UPDATED 0.5)
-(def _KEYSPACE_NAME "seats")
 
 
 ; test scale knobs (make sure appropriate snapshots will be used)
