@@ -32,6 +32,10 @@ case $i in
     TIME="${i#*=}"
     shift # past argument=value
     ;;
+    -s=*|--scale=*)
+    SCALE="${i#*=}"
+    shift # past argument=value
+    ;;
     -d=*|--init_db=*)
     DB="${i#*=}"
     shift # past argument=value
@@ -51,6 +55,7 @@ echo "====================================="
 echo "Conccurency   = ${CONCURRENCY}"
 echo "Time          = ${TIME}"
 echo "Benchmark     = ${BENCH}"
+echo "Scale Factor  = ${SCALE}"
 echo "Load Raw Data = ${LOADRAW}"
 echo "Initialize DB = ${DB}"
 echo "Initialize KS = ${KS}"
@@ -117,7 +122,7 @@ if [ ${LOADRAW} = "true" ]; then
     	done < "/home/ubuntu/jepsen.seats/config/nodes"
 
 	echo ">>> copying snapshots to n1"
-	scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/jepsen.seats/snapshots/$BENCH ubuntu@n1:/home/ubuntu/
+	scp -r -i "/home/ubuntu/.ssh/ec2-ohio.pem" /home/ubuntu/jepsen.seats/snapshots/$BENCH/$SCALE/$BENCH ubuntu@n1:/home/ubuntu/
 fi
 
 
