@@ -6,8 +6,6 @@
 
 
 
-(def closeConnection (fn [conn]    (utils.CassConn/closeConnection conn)))
-(def openConnection  (fn [ip]      (utils.CassConn/getConnection ip)))
 
 (def operationMap [{:n 1, :f :CHCK-TXN,
                           :javaFunc (fn [conn args] (kv.DepositChecking/deposit_checking conn (nth args 0)(nth args 1))),

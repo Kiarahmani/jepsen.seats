@@ -2,6 +2,10 @@
 
 ;; UTILS
 ;;====================================================================================
+
+(def closeConnection (fn [conn]    (utils.CassConn/closeConnection conn)))
+(def openConnection  (fn [ip]      (utils.CassConn/getConnection ip)))
+
 (defn cached-install?
   [src]
   (try (c/exec :grep :-s :-F :-x (lit src) (lit ".download"))

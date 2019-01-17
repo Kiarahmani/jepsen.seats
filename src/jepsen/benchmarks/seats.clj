@@ -4,8 +4,6 @@
 ; THE ORIGINAL FILE: benchmarks/seats.clj
 ;XXX THIS FILE IS COPIED INTO cassandra-operations.clj AT RUNTIME
 
-(def closeConnection (fn [conn]    (utils.CassConn/closeConnection conn)))
-(def openConnection  (fn [ip]      (utils.CassConn/getConnection ip)))
 
 (def operationMap [{:n 1, :f :DR-TXN, 
                           :javaFunc (fn [conn args] (seats.DeleteReservation/deleteReservation conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4))), 
