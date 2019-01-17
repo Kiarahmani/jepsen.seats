@@ -74,6 +74,20 @@ else
 	KS=""
 fi
 
+# --- Parameter Checks
+if [ ! -d "/home/ubuntu/jepsen.seats/snapshots/${BENCH}" ]; then
+	echo "/home/ubuntu/jepsen.seats/snapshots/${BENCH}/${SCALE}/${BENCH}: dir does not exist."
+	echo "Error: Snapshots for specified benchmark does not exist. Please make sure you have set up the directories correctly."
+	exit 1
+fi
+
+if [ ! -d "/home/ubuntu/jepsen.seats/snapshots/${BENCH}/${SCALE}/${BENCH}" ]; then
+	echo "/home/ubuntu/jepsen.seats/snapshots/${BENCH}/${SCALE}/${BENCH}: dir does not exist."
+	echo "Error: Snapshots for specified scale factor does not exist. Please make sure you have set up the directories correctly."
+	exit 2
+fi
+
+
 
 
 # --- Locks -------------------------------------------------------
@@ -89,6 +103,9 @@ touch $LOCK_FILE
 
 # --- Body --------------------------------------------------------
 #
+
+lein clean
+
 echo ">>> updating java application from git repository:"
 cd ~/Jepsen_Java_Tests/ 
 git pull
@@ -130,7 +147,7 @@ fi
 
 echo ""
 echo ">>> calling Jepsen:"
-time lein run test --nodes-file /home/ubuntu/jepsen.seats/config/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS} --init-java  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem --bench ${BENCH}
+time lein run test --nodes-file /home/ubuntu/jepsen.seats/config/nodes  --concurrency ${CONCURRENCY} --time-limit ${TIME} ${DB} ${KS} --init-java  --username ubuntu --ssh-private-key ~/.ssh/ec2-ohio.pem --bench ${BENCH} --scale ${SCALE}
 
 
 
@@ -150,4 +167,17 @@ for i in $UniqeErrors; do
 	fi
 done
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+
+
+
+
+# --- Cleaning Up --------------------------------------------------------
+#
+
+#echo ">>> removing files"
+#rm /home/ubuntu/jepsen.seats/src/jepsen/cassandra-operations.clj
+#echo "done."
+
+
 

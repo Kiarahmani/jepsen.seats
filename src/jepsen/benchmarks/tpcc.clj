@@ -9,15 +9,9 @@
 (def closeConnection (fn [conn]    (utils.CassConn/closeConnection conn)))
 (def openConnection  (fn [ip]      (utils.CassConn/getConnection ip)))
 
-(def operationMap [{:n 1, :f :CHCK-TXN,
-                          :javaFunc (fn [conn args] (kv.DepositChecking/deposit_checking conn (nth args 0)(nth args 1))),
-                          :freq 45/100},
-                   {:n 2, :f :SVNG-TXN,
-                          :javaFunc (fn [conn args] (kv.DepositSaving/deposit_saving conn (nth args 0)(nth args 1))),
-                          :freq 45/100}
-                   {:n 3, :f :TEST-TXN,
-                          :javaFunc (fn [conn args] (kv.Check/check conn (nth args 0))),
-                          :freq 10/100}
+(def operationMap [{:n 1, :f :NO-TXN,
+                          :javaFunc (fn [conn args] (tpcc.NewOrder/newOrder conn)),
+                          :freq 100/100}
                    ])
 
 
@@ -26,17 +20,7 @@
 
 
 ;====================================================================================================
-; generate a new flight id
 
-
-(defn gen_bal
-  []
-  (rand-int 20))
-
-(defn gen_id
-  []
-  (+ (rand-int 999) 1)
-  )
 ;
 ;
 
@@ -45,9 +29,7 @@
   [txnNo]
   (condp = txnNo
     ;withdraw
-    1 [(gen_id), (gen_bal)]
-    2 [(gen_id), (gen_bal)]
-    3 [(gen_id)]
+    1 []
     (info "ERROR!! ---> UNKNOWN txnNo")
     ))
 

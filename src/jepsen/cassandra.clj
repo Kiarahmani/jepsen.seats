@@ -24,14 +24,7 @@
 (:import (clojure.lang ExceptionInfo)
            (java.net InetAddress)
 	   (java.net NetworkInterface)
-           (SeatsUtils)
-           (DeleteReservation)
-           (FindFlights)
-           (FindOpenSeats)
-           (NewReservation)
-           (UpdateCustomer)
-           (UpdateReservation))
-)
+           ))
 
 (load "cassandra-db")
 (load "cassandra-operations")
@@ -45,6 +38,9 @@
     [["-i" "--init-db" "wipes down any excisting data and creates a fresh cluster"]
      ["-j" "--init-java" "installs java in freshly created jepsen nodes"]
      ["-k" "--init-ks" "drops old keyspace and tables and creates and intializes fresh ones"]
+     ["-s" "--scale SCALE" "the scale factor of the initial state of the benchmark"
+      :default 1
+      :parse-fn read-string]
      [nil "--bench BENCH" "the benchmark under test" 
       :default  "DEFAULT_BENCHMARK"
       :parse-fn read-string

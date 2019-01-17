@@ -38,7 +38,7 @@
 ; generate a new flight id
 (defn gen_flight
   [index]
-  {:f_id (seats.SeatsUtils/getExistingResFlightId index)})
+  {:f_id (seats.Utils_seats/getExistingResFlightId index)})
 
 ; generate a new customer id
 (defn gen_cust
@@ -46,21 +46,21 @@
   (if (and canBeNull (< (rand) consts/_CUST_BY_STR_PROB))
       ; generates a customer with null (=-1) id with a string containing the id
       {:c_id -1,
-       :c_id_str (str (seats.SeatsUtils/getExistingResCustomerId index))}
+       :c_id_str (str (seats.Utils_seats/getExistingResCustomerId index))}
       ; generates a customer with a valid id
-      {:c_id (seats.SeatsUtils/getExistingResCustomerId index),
+      {:c_id (seats.Utils_seats/getExistingResCustomerId index),
         :c_id_str ""}))
 
 ; generate a new airline id
 (defn gen_al
   []
-  {:al_id (seats.SeatsUtils/getNextAirlineId)})
+  {:al_id (seats.Utils_seats/getNextAirlineId)})
 
 ; generate a new frequent flyer id
 (defn gen_ff
   []
   (if (< (rand) consts/_FF_SHOULD_BE_UPDATED)
-  {:ff_c_id_str (str (:c_id (gen_cust false (seats.SeatsUtils/getRandomResIndex)))),
+  {:ff_c_id_str (str (:c_id (gen_cust false (seats.Utils_seats/getRandomResIndex)))),
    :ff_al_id (:al_id (gen_al))}
   {:ff_c_id_str (str -1),:ff_al_id -1}))
 ;
@@ -72,38 +72,38 @@
   [txnNo]
   (condp = txnNo
     ;deleteReservation
-    1 (let [index (seats.SeatsUtils/getRandomResIndex)
+    1 (let [index (seats.Utils_seats/getRandomResIndex)
             cust (gen_cust true index) 
             ff   (gen_ff)
             f    (gen_flight index)]
       [(:f_id f),(:c_id cust), (:c_id_str cust), (:ff_c_id_str ff), (:ff_al_id ff)])
     ;FindFlights
-    2 (let [beginDate (seats.SeatsUtils/getNextRandomDate)] 
-      [(rand-int consts/_AIRPORT_COUNT),(rand-int consts/_AIRPORT_COUNT),beginDate,(seats.SeatsUtils/getNextDateWithBegin beginDate),(rand-int consts/_MAXIMUM_ACCEPTABLE_DISTANCE)])
+    2 (let [beginDate (seats.Utils_seats/getNextRandomDate)] 
+      [(rand-int consts/_AIRPORT_COUNT),(rand-int consts/_AIRPORT_COUNT),beginDate,(seats.Utils_seats/getNextDateWithBegin beginDate),(rand-int consts/_MAXIMUM_ACCEPTABLE_DISTANCE)])
     ;FindOpenSeats
-    3  [(let [index (seats.SeatsUtils/getRandomResIndex)
+    3  [(let [index (seats.Utils_seats/getRandomResIndex)
               f (gen_flight index)]
         (:f_id f))]
     ;NewReservation
-    4  (let [index   (seats.SeatsUtils/getRandomResIndex)
-             custIDX (seats.SeatsUtils/getRandomResIndex)
-             r_id    (seats.SeatsUtils/getNewResId)
+    4  (let [index   (seats.Utils_seats/getRandomResIndex)
+             custIDX (seats.Utils_seats/getRandomResIndex)
+             r_id    (seats.Utils_seats/getNewResId)
              f       (gen_flight index)
              c       (gen_cust false custIDX)
              seatnum (+ (rand-int 146) 3)
-             attrs   (seats.SeatsUtils/getNewAttrs)]
+             attrs   (seats.Utils_seats/getNewAttrs)]
         [r_id,(:c_id c),(:f_id f),seatnum,1,attrs])
     ;UpdateCustomer
-    5  (let [index (seats.SeatsUtils/getRandomResIndex)
+    5  (let [index (seats.Utils_seats/getRandomResIndex)
              cust (gen_cust true index)]
        [(:c_id cust), (:c_id_str cust),(- (rand-int 5) 2),(long (rand index)),(long (rand index))])
     ;UpdateReservation
-    6  (let [index (seats.SeatsUtils/getRandomResIndex)
-             r_id    (seats.SeatsUtils/getNewResId)
+    6  (let [index (seats.Utils_seats/getRandomResIndex)
+             r_id    (seats.Utils_seats/getNewResId)
              c (gen_cust false index)
              f (gen_flight index)
              seatnum (+ (rand-int 147) 2)]
-        [r_id,(:f_id f),(:c_id c),seatnum,1,(long (rand (seats.SeatsUtils/getRandomResIndex)))])
+        [r_id,(:f_id f),(:c_id c),seatnum,1,(long (rand (seats.Utils_seats/getRandomResIndex)))])
     (info "ERROR!! ---> UNKNOWN txnNo")
     ))
 
