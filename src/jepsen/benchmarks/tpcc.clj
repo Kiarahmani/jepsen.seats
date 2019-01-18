@@ -29,7 +29,7 @@
   "generates input arguments for the requested transaction"
   [txnNo]
   (condp = txnNo
-    1 [1,1,1,20,30,nil,nil,nil]
+    1 [1,1,1,1,1,nil,nil,nil]
     2 []
     3 []
     4 []
