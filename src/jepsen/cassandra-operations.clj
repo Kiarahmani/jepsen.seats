@@ -29,7 +29,17 @@
   "generates input arguments for the requested transaction"
   [txnNo]
   (condp = txnNo
-    1 [1,1,1,20,30,nil,nil,nil]
+    1 (let [w_id      (tpcc.Utils_tpcc/get_w_id)
+            d_id      (tpcc.Utils_tpcc/get_d_id)
+            c_id      (tpcc.Utils_tpcc/get_c_id)
+            num_items (tpcc.Utils_tpcc/get_num_items)
+            wh_sup_and_lcl_list (tpcc.Utils_tpcc/get_sup_wh_and_o_all_local num_items w_id)
+            wh_sup    (nth wh_sup_and_lcl_list 0)
+            all_local (nth wh_sup_and_lcl_list 1)
+            item_ids  (tpcc.Utils_tpcc/get_item_ids num_items)
+            order_qnts(tpcc.Utils_tpcc/get_order_quantities num_items)
+            ]
+        [w_id,d_id,c_id,all_local,num_items,item_ids,wh_sup,order_qnts])
     2 []
     3 []
     4 []
