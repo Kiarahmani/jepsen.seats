@@ -123,7 +123,7 @@
 	  :model      (my-txn-status)
 	  :client (Client. nil)
 	  :generator (->> my-gen
-                          (gen/stagger 1/100) ;XXX
+                          (gen/stagger 1/10) ;XXX
                           (gen/nemesis nil)
                           (gen/time-limit (:time-limit opts)))}))
 
