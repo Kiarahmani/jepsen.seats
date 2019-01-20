@@ -14,7 +14,7 @@
                           :javaFunc (fn [conn args] (tpcc.Payment/payment conn   (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5)(nth args 6)(nth args 7))),
                           :freq 43/100}
                    {:n 3, :f :OS-TXN,
-                          :javaFunc (fn [conn args] (tpcc.OrderStatus/orderStatus conn)),
+                          :javaFunc (fn [conn args] (tpcc.OrderStatus/orderStatus conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4))),
                           :freq 4/100}
                    {:n 4, :f :DV-TXN,
                           :javaFunc (fn [conn args] (tpcc.Delivery/delivery conn)),
@@ -51,7 +51,14 @@
             customerDistrictID  (nth cust_info 1)
             paymentAmount       (tpcc.Utils_tpcc/get_paymentAmount)]
         [w_id,d_id,customerByName,c_id,c_last,customerWarehouseID,customerDistrictID,paymentAmount])
-    3 []
+    
+    3 (let [w_id                (tpcc.Utils_tpcc/get_w_id) 
+            d_id                (tpcc.Utils_tpcc/get_d_id)
+            orderStatus_cust    (tpcc.Utils_tpcc/get_orderStatus_cust)
+            customerByName      (nth orderStatus_cust 0)
+            c_id                (nth orderStatus_cust 1)
+            c_last              (nth orderStatus_cust 2)]
+        [w_id,d_id,customerByName,c_id,c_last])
     4 []
     5 []
     (info "ERROR!! ---> UNKNOWN txnNo")))
