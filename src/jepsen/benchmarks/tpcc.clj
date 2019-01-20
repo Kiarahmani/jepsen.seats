@@ -11,7 +11,7 @@
                           :javaFunc (fn [conn args] (tpcc.NewOrder/newOrder conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5)(nth args 6)(nth args 7))),
                           :freq 45/100}
                    {:n 2, :f :PM-TXN,
-                          :javaFunc (fn [conn args] (tpcc.Payment/payment conn)),
+                          :javaFunc (fn [conn args] (tpcc.Payment/payment conn   (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5)(nth args 6)(nth args 7))),
                           :freq 43/100}
                    {:n 3, :f :OS-TXN,
                           :javaFunc (fn [conn args] (tpcc.OrderStatus/orderStatus conn)),
@@ -37,10 +37,20 @@
             wh_sup    (nth wh_sup_and_lcl_list 0)
             all_local (nth wh_sup_and_lcl_list 1)
             item_ids  (tpcc.Utils_tpcc/get_item_ids num_items)
-            order_qnts(tpcc.Utils_tpcc/get_order_quantities num_items)
-            ]
+            order_qnts(tpcc.Utils_tpcc/get_order_quantities num_items)]
         [w_id,d_id,c_id,all_local,num_items,item_ids,wh_sup,order_qnts])
-    2 []
+
+    2 (let [w_id                (tpcc.Utils_tpcc/get_w_id)
+            d_id                (tpcc.Utils_tpcc/get_d_id)
+            payment_cust        (tpcc.Utils_tpcc/get_payment_cust)
+            customerByName      (nth payment_cust 0)
+            c_id                (nth payment_cust 1)
+            c_last              (nth payment_cust 2)
+            cust_info           (tpcc.Utils_tpcc/get_customerinfo w_id d_id)
+            customerWarehouseID (nth cust_info 0)
+            customerDistrictID  (nth cust_info 1)
+            paymentAmount       (tpcc.Utils_tpcc/get_paymentAmount)]
+        [w_id,d_id,customerByName,c_id,c_last,customerWarehouseID,customerDistrictID,paymentAmount])
     3 []
     4 []
     5 []
