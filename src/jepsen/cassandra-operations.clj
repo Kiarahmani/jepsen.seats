@@ -17,7 +17,7 @@
                           :javaFunc (fn [conn args] (tpcc.OrderStatus/orderStatus conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4))),
                           :freq 4/100}
                    {:n 4, :f :DV-TXN,
-                          :javaFunc (fn [conn args] (tpcc.Delivery/delivery conn)),
+                          :javaFunc (fn [conn args] (tpcc.Delivery/delivery conn (nth args 0)(nth args 1))),
                           :freq 4/100}
                    {:n 5, :f :SL-TXN,
                           :javaFunc (fn [conn args] (tpcc.StockLevel/stockLevel conn)),
@@ -59,7 +59,9 @@
             c_id                (nth orderStatus_cust 1)
             c_last              (nth orderStatus_cust 2)]
         [w_id,d_id,customerByName,c_id,c_last])
-    4 []
+    4 (let [w_id          (tpcc.Utils_tpcc/get_w_id)
+            o_carrier_id  (tpcc.Utils_tpcc/get_o_carrier_id)]
+       [w_id, o_carrier_id])
     5 []
     (info "ERROR!! ---> UNKNOWN txnNo")))
 
