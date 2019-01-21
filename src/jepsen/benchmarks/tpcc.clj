@@ -20,7 +20,7 @@
                           :javaFunc (fn [conn args] (tpcc.Delivery/delivery conn (nth args 0)(nth args 1))),
                           :freq 4/100}
                    {:n 5, :f :SL-TXN,
-                          :javaFunc (fn [conn args] (tpcc.StockLevel/stockLevel conn)),
+                          :javaFunc (fn [conn args] (tpcc.StockLevel/stockLevel conn (nth args 0)(nth args 1)(nth args 2))),
                           :freq 4/100}])
 ;====================================================================================================
 ;
@@ -62,7 +62,10 @@
     4 (let [w_id          (tpcc.Utils_tpcc/get_w_id)
             o_carrier_id  (tpcc.Utils_tpcc/get_o_carrier_id)]
        [w_id, o_carrier_id])
-    5 []
+    5 (let [w_id      (tpcc.Utils_tpcc/get_w_id)
+            d_id      (tpcc.Utils_tpcc/get_d_id)
+            threshold (tpcc.Utils_tpcc/get_threshold)]
+        [w_id, d_id, threshold])
     (info "ERROR!! ---> UNKNOWN txnNo")))
 
 
