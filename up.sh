@@ -156,7 +156,7 @@ time lein run test --nodes-file /home/ubuntu/jepsen.seats/config/nodes  --concur
 
 echo ""
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo ">>> analyzing logs:"
+echo ">>> analyzing logs for errors:"
 UniqeErrors=`grep -E "TXN\s[1-9][1-9]" store/latest/history.txt | cut -f3,4 | sort | uniq`
 echo
 for i in $UniqeErrors; do
@@ -167,6 +167,16 @@ for i in $UniqeErrors; do
 	fi
 done
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+echo ""
+echo ""
+echo ">>> checking consistency requirements at Cassandra node n2"
+ssh -i "/home/ubuntu/.ssh/ec2-ohio.pem" ubuntu@n2 python /home/ubuntu/consistency/c1.py
+ssh -i "/home/ubuntu/.ssh/ec2-ohio.pem" ubuntu@n2 python /home/ubuntu/consistency/c2a.py
+ssh -i "/home/ubuntu/.ssh/ec2-ohio.pem" ubuntu@n2 python /home/ubuntu/consistency/c2b.py
+ssh -i "/home/ubuntu/.ssh/ec2-ohio.pem" ubuntu@n2 python /home/ubuntu/consistency/c2c.py
+ssh -i "/home/ubuntu/.ssh/ec2-ohio.pem" ubuntu@n2 python /home/ubuntu/consistency/c3.py
+ssh -i "/home/ubuntu/.ssh/ec2-ohio.pem" ubuntu@n2 python /home/ubuntu/consistency/c5.py
 
 
 

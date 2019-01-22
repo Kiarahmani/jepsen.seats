@@ -7,7 +7,11 @@
 
 
 
-(def operationMap [{:n 1, :f :NO-TXN,
+(def operationMap [ 
+                   {:n 1, :f :DUMMY-TXN,
+                          :javaFunc (fn [conn args] (info "DUMMY CALL"))
+                          :freq 100/100}
+                   {:n 1, :f :NO-TXN,
                           :javaFunc (fn [conn args] (tpcc.NewOrder/newOrder conn (nth args 0)(nth args 1)(nth args 2)(nth args 3)(nth args 4)(nth args 5)(nth args 6)(nth args 7))),
                           :freq 45/100}
                    {:n 2, :f :PM-TXN,
